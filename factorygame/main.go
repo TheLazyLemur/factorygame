@@ -4,6 +4,22 @@ import (
 	rl "github.com/gen2brain/raylib-go/raylib"
 )
 
+type CellType int
+
+const (
+	Empty CellType = iota
+	Build
+	Resource
+)
+
+type Cell struct {
+	Type CellType
+}
+
+type Grid struct {
+	cells map[int]map[int]Cell
+}
+
 const (
 	screenWidth  = 1920
 	screenHeight = 1080
@@ -16,13 +32,17 @@ var game = Game{
 	debugMode:    false,
 	camera: GameCamera{
 		camera: rl.Camera2D{
-			Zoom: 1.0,
+			Zoom:     1.0,
 			Rotation: 0.0,
-			Offset: rl.NewVector2(float32(rl.GetScreenWidth()/2), float32(rl.GetScreenHeight()/2)),
+			Offset:   rl.NewVector2(float32(rl.GetScreenWidth()/2), float32(rl.GetScreenHeight()/2)),
 		},
-		trgt:   snapToGrid(rl.NewVector2(0, 0)),
-		zoom:   1.0,
+		trgt: snapToGrid(rl.NewVector2(0, 0)),
+		zoom: 1.0,
 	},
+}
+
+var grid = Grid{
+	cells: make(map[int]map[int]Cell),
 }
 
 type Message struct {
@@ -35,6 +55,10 @@ type MessageQueue struct {
 }
 
 func main() {
+	for i := -10000; i < 10000; i++ {
+		grid.cells[i] = make(map[int]Cell)
+	}
+
 	rl.InitWindow(screenWidth, screenHeight, "Factory Game")
 	defer rl.CloseWindow()
 
@@ -56,6 +80,9 @@ func main() {
 		}
 
 		game.resources = append(game.resources, randPoint)
+		grid.cells[int(randPoint.X)][int(randPoint.Y)] = Cell{
+			Type: Resource,
+		}
 	}
 
 	newPoints := make([]rl.Vector2, 0)
@@ -69,6 +96,9 @@ func main() {
 				dist := rl.Vector2Distance(rl.NewVector2(x, y), rl.NewVector2(i, j))
 				if dist <= radius {
 					newPoints = append(newPoints, snapToGrid(rl.NewVector2(i, j)))
+					grid.cells[int(i)][int(j)] = Cell{
+						Type: Resource,
+					}
 				}
 
 			}

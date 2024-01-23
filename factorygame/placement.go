@@ -1,6 +1,10 @@
 package main
 
-import rl "github.com/gen2brain/raylib-go/raylib"
+import (
+	"fmt"
+
+	rl "github.com/gen2brain/raylib-go/raylib"
+)
 
 type PlacementSystem struct{
 	ghost rl.Vector2
@@ -63,5 +67,15 @@ func (ps *PlacementSystem) handlePlacement(ghost rl.Vector2) {
 			game.buildings = append(game.buildings, building)
 			game.messageQueue.msgs = append(game.messageQueue.msgs, &Message{text: "Spawned!", time: 3})
 		}
+
+		grid.cells[int(ghost.X)][int(ghost.Y)] = Cell{
+			Type: Build,
+		}
+
+		cellsForHeight := (building.Pos.Y)/50
+		cellsForWidth := (building.Pos.X)/50
+
+		fmt.Println(building.Pos)
+		fmt.Println(cellsForHeight, cellsForWidth)
 	}
 }

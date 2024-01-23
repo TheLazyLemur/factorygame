@@ -10,12 +10,16 @@ type GameCamera struct {
 	camera rl.Camera2D
 	trgt   rl.Vector2
 	zoom   float32
+	hasRun bool
 }
 
 func (c *GameCamera) Update() {
 	c.camera.Target = c.trgt
 	c.camera.Zoom = c.zoom
-	c.camera.Offset = rl.NewVector2(float32(rl.GetScreenWidth()/2), float32(rl.GetScreenHeight()/2))
+	if !c.hasRun {
+		c.hasRun = true
+		c.camera.Offset = rl.NewVector2(float32(rl.GetScreenWidth()/2), float32(rl.GetScreenHeight()/2))
+	}
 }
 
 type Game struct {
